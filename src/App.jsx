@@ -86,11 +86,30 @@ const App = () => {
       }</li>
     </ul>)
 
+
+  // test create object
+  const templateTask = {
+    id: 3,
+    name: 'do react homework',
+    tags: '3,5'
+  }
+
+  const addTask = () => {
+    console.log('clicked')
+
+    noteServices
+      .create(categories[0], templateTask)
+      .then(setTasks(tasks.concat(templateTask)))
+  }
+
+
   return (
     <div>
       {listTasks}
       <br />
       {listOptions}
+      <br />
+      <input type="button" value="click to test create task" onClick={() => addTask()} />
     </div>
   )
 }

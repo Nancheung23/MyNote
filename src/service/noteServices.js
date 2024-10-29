@@ -13,6 +13,16 @@ const getAll = async (category) => {
         )
 }
 
+// POST 'create'
+const create = async (category, newObject) => {
+    return axios.post(`${url}${category}`, newObject)
+        .then(response => {
+            console.log(`create object in ${category}...\n`, newObject)
+            return response.data
+        })
+        .catch(err => console.log(`failed to create in ${category}!\n`, err)
+        )
+}
 
 
-export default { getAll }
+export default { getAll, create }
