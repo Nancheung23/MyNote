@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import noteServices from './service/noteServices'
+import noteServices from './services/noteServices'
 
 const App = () => {
   const categories = ['tasks', 'tags', 'timestamps', 'options', 'timesfortask']
