@@ -1,15 +1,23 @@
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Overview from '../views/Overview.jsx'
+import TaskCreation from '../views/TaskCreation.jsx'
+import Statistics from '../views/StatisticsView.jsx'
+import LogsView from '../views/LogsView.jsx'
+import SettingsView from '../views/SettingsView.jsx'
+import NavBar from "../components/NavBar.jsx";
 
 const AppRoutes = () => {
     return (
         <Router>
-            <Switch>
-                <Route path='/Home' element={<Overview />}></Route>
-                <Route path='/TaskCreation' element={<TaskCreation />}></Route>
-                <Route path='/Statistics' element={<Statistics />}></Route>
-                <Route path='/Logs' element={<LogsView />}></Route>
-                <Route path='/Settings' element={<SettingsView />}></Route>
-            </Switch>
+            {/* navigation */}
+            <NavBar />
+            <Routes>
+                <Route path='/Home' element={<Overview />} />
+                <Route path='/TaskCreation' element={<TaskCreation />} />
+                <Route path='/Statistics' element={<Statistics />} />
+                <Route path='/Logs' element={<LogsView />} />
+                <Route path='/Settings' element={<SettingsView />} />
+            </Routes>
         </Router>
     )
 }
