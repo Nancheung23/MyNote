@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import noteServices from '../services/noteServices'
 import Note from "../components/Note"
+import '../assets/styles/overview.css'
 
 const Overview = () => {
     const [notes, setNotes] = useState([])
