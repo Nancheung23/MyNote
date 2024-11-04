@@ -2,28 +2,74 @@ import React from "react"
 import { NavLink } from "react-router-dom"
 
 const NavBar = () => {
-    // for each element of NavBar, when it's the current view, classname switch to **_activated, otherwise will be **_default
     return (
-        <nav id="navbar">
-            <ul>
+        <nav className="bg-gray-800 p-4">
+            <ul className="flex space-x-4">
                 <li>
-                    <NavLink to={'/Home'} className={({ isActive }) => "home_" + (isActive ? "activated" : "default")}>Home</NavLink>
+                    {/* apply hover style and bold,underline while active */}
+                    <NavLink
+                        to="/Home"
+                        className={({ isActive }) =>
+                            isActive
+                                ? "text-white font-bold border-b-2 border-yellow-400"
+                                : "text-gray-300 hover:text-white"
+                        }
+                    >
+                        Home
+                    </NavLink>
                 </li>
                 <li>
-                    <NavLink to={'/TaskCreation'} className={({ isActive }) => "taskCreation_" + (isActive ? "activated" : "default")}>Create A Task</NavLink>
+                    <NavLink
+                        to="/TaskCreation"
+                        className={({ isActive }) =>
+                            isActive
+                                ? "text-white font-bold border-b-2 border-yellow-400"
+                                : "text-gray-300 hover:text-white"
+                        }
+                    >
+                        Create A Task
+                    </NavLink>
                 </li>
                 <li>
-                    <NavLink to={'/Statistics'} className={({ isActive }) => "statistics_" + (isActive ? "activated" : "default")}>Statistics</NavLink>
+                    <NavLink
+                        to="/Statistics"
+                        className={({ isActive }) =>
+                            isActive
+                                ? "text-white font-bold border-b-2 border-yellow-400"
+                                : "text-gray-300 hover:text-white"
+                        }
+                    >
+                        Statistics
+                    </NavLink>
                 </li>
                 <li>
-                    <NavLink to={'/Logs'} className={({ isActive }) => "logs_" + (isActive ? "activated" : "default")}>Logs</NavLink>
+                    <NavLink
+                        to="/Logs"
+                        className={({ isActive }) =>
+                            isActive
+                                ? "text-white font-bold border-b-2 border-yellow-400"
+                                : "text-gray-300 hover:text-white"
+                        }
+                    >
+                        Logs
+                    </NavLink>
                 </li>
                 <li>
-                    <NavLink to={'/Settings'} className={({ isActive }) => "settings_" + (isActive ? "activated" : "default")}>Settings</NavLink>
+                    <NavLink
+                        to="/Settings"
+                        className={({ isActive }) =>
+                            isActive
+                                ? "text-white font-bold border-b-2 border-yellow-400"
+                                : "text-gray-300 hover:text-white"
+                        }
+                    >
+                        Settings
+                    </NavLink>
                 </li>
             </ul>
         </nav>
     )
 }
+
 
 export default NavBar
