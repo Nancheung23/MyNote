@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 import noteServices from '../services/noteServices'
 import Note from "../components/Note"
 import '../assets/styles/overview.css'
@@ -30,6 +32,56 @@ const Overview = () => {
 
     if (loading) {
         return <p>Loading...</p>
+    }
+
+    // update tag status in backend when edit tags
+    const updateNoteTags = async (noteId, updatedTags) => {
+        // reset note firstly
+        setNotes(prev =>
+            prev.map(note => note.id === noteId ? { ...note, tags: updatedTags } : note)
+        )
+        // find deleted and added tag
+        const addedTags = updatedTags.filter(tag => !totalTags.includes(tag))
+        setTotalTags([...totalTags, ...addedTags])
+        const removedTags = totalTags.filter(tag => !updatedTags.includes(tag))
+        setTotalTags(totalTags.filter(tag => !removedTags.includes(tag)))
+        try {
+            // POST tag
+            for (const tag of addedTags) {
+                await noteServices.create('tags', {
+                    name: tag
+                })
+            }
+            // DELETE tag
+            for (const tag of removedTags) {
+                const tagToDelete = notes.find(note => note.id === noteId)?.tags.find(t => t.name === tag)
+                if (tagToDelete) {
+                    await noteServices.del('tags', {
+                        id: tagToDelete.id,
+                        name: tag
+                    })
+                }
+            }
+            // PUT task
+            const updatedTags = await noteServices.getAll('tags')
+            const tagReference = updatedTags.map(tagName => {
+                const tag = updatedTags.find(t => t.name === tagName)
+                return tag ? tag.id : null
+            }).filter(tagId => tagId !== null).join(',')
+            await noteServices.update('tasks', {
+                id: noteId,
+                name: notes.find(note => note.id === noteId).name,
+                tags: tagReference
+            })
+
+            // notification for successful modification
+            toast.success("Task created successfully!", {
+                autoClose: 2000
+            })
+        } catch (error) {
+            console.log('failed to modify:', error)
+            toast.error("Failed to modify task!")
+        }
     }
 
     // Update note status in backend when toggled
@@ -110,7 +162,7 @@ const Overview = () => {
                                                     {...provided.dragHandleProps}
                                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
                                                 >
-                                                    <Note note={note} onStatusChange={handleStatusChange} />
+                                                    <Note note={note} onStatusChange={handleStatusChange} onUpdateTags={updateNoteTags} />
                                                 </div>
                                             )}
                                         </Draggable>

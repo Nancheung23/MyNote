@@ -20,8 +20,42 @@ const request = async (method, category, data = null) => {
 // specific method
 const getAll = (category) => request('get', category)
 const create = (category, newObject) => request('post', category, newObject)
-const update = (category, newObject) => request('put', category, newObject)
-const del = (category) => request('delete', category)
+
+// update 
+const update = async (category, newObject) => {
+    try {
+        if (!newObject.id) {
+            console.error("Update failed: Missing ID in the update object")
+            return null
+        }
+        const url = `${baseUrl}${category}/${newObject.id}`
+        const response = await axios.put(url, newObject)
+        console.log(`Update ${category} successfully`)
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to update from ${category}:`, error)
+        return null;
+    }
+}
+
+// delete
+const del = async (category, name) => {
+    try {
+        const items = await getAll(category)
+        const itemToDelete = items.find(item => item.name === name)
+        if (!itemToDelete) {
+            console.log(`Item with name "${name}" not found in ${category}`)
+            return null
+        }
+        const url = `${baseUrl}${category}/${itemToDelete.id}`
+        const response = await axios.delete(url)
+        console.log(`DELETE ${category} successful for ${name}`)
+        return response.data
+    } catch (error) {
+        console.error(`Failed to delete ${name} from ${category}:`, error)
+        return null
+    }
+}
 
 const getNotes = async () => {
     try {
