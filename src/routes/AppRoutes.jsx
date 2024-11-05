@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Overview from '../views/Overview.jsx'
 import TaskCreation from '../views/TaskCreation.jsx'
 import Statistics from '../views/StatisticsView.jsx'
@@ -12,6 +12,9 @@ const AppRoutes = () => {
             {/* navigation */}
             <NavBar />
             <Routes>
+                {/* default route redirect to /Home */}
+                <Route path='/' element={<Navigate to='/Home' replace />} />
+                {/* routes */}
                 <Route path='/Home' element={<Overview />} />
                 <Route path='/TaskCreation' element={<TaskCreation />} />
                 <Route path='/Statistics' element={<Statistics />} />

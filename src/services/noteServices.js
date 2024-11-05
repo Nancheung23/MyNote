@@ -15,7 +15,7 @@ const request = async (method, category, data = null) => {
         console.error(`Failed to ${method} ${category}:`, error)
         return null
     }
-};
+}
 
 // specific method
 const getAll = (category) => request('get', category)

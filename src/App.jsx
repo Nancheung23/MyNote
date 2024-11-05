@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
-import noteServices from './services/noteServices'
+import React from 'react'
+import AppRoutes from './routes/AppRoutes'
 
 const App = () => {
-
+    return (
+        <AppRoutes />
+    )
 }
 
 export default App
