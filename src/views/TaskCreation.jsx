@@ -34,12 +34,23 @@ const TaskCreation = () => {
         return <p>Loading...</p>
     }
 
+    // prevent from create duplicated tags
+    const hasDuplicateTags = (tags) => {
+        return tags.some((tag, index) =>
+            tags.findIndex(t => t === tag) !== index
+        )
+    }
+
     const handleCreate = async (e) => {
         e.preventDefault()
 
         // get input from form
         const newTimestamp = new Date().toISOString().replace('T', ' ').replace('Z', '')
         const inputTags = newNoteTags.split(',').map(tag => tag.trim())
+        if (hasDuplicateTags(inputTags)) {
+            toast.error("Don't put duplicated tags!")
+            return
+        }
         // filter non exist tags
         const finalTags = [...selectedTags, ...inputTags].filter(tag => tag)
         // filter new tag not included in tags
@@ -115,9 +126,9 @@ const TaskCreation = () => {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Select Tags</label>
                     <div className="flex flex-wrap gap-2 mb-2">
-                        {totalTags.map(tag => (
+                        {totalTags.map((tag, index) => (
                             <button
-                                key={tag}
+                                key={`${tag}-${index}-${new Date().toISOString()}`}
                                 type="button"
                                 onClick={() => handleTagSelection(tag)}
                                 className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"

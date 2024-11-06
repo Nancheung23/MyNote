@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react"
-import "react-toastify/dist/ReactToastify.css"
 import { FaEdit, FaTrash } from "react-icons/fa"
 
 // 2 callback parameters
@@ -45,6 +44,13 @@ const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName, onDeleteNote }
     // name editing
     const handleNameChange = (e) => setNewName(e.target.value)
 
+    // prevent from create duplicated tags
+    const hasDuplicateTags = (tags) => {
+        return tags.some((tag, index) =>
+            tags.findIndex(t => t === tag) !== index
+        )
+    }
+
     // handle submit
     const handleSubmit = () => {
         if (newName.trim() === "") {
@@ -53,6 +59,10 @@ const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName, onDeleteNote }
         }
         const updatedTags = newTags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
         const updateName = newName ? newName : note.name
+        if (hasDuplicateTags(updatedTags)) {
+            alert("Don't put duplicated tags!")
+            return
+        }
         onUpdateTags(note.id, updatedTags)
         onUpdateName(note.id, updateName)
         setIsEditing(false)
