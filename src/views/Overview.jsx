@@ -87,7 +87,7 @@ const Overview = () => {
             setNotes(newNotes)
 
             // notification for successful modification, wait for return...
-            toast.success("Task created successfully!", {
+            toast.success("Task modified successfully!", {
                 autoClose: 2000
             })
         } catch (error) {
@@ -163,7 +163,7 @@ const Overview = () => {
                             {
                                 notes
                                     .filter(note =>
-                                        selectedTags.length === 0 || note.tags.some(tag => selectedTags.includes(tag.name))
+                                        selectedTags.length === 0 || selectedTags.every(selectedTag => note.tags.some(tag => tag.name === selectedTag))
                                     )
                                     .map((note, index) => (
                                         <Draggable key={note.id} draggableId={note.id.toString()} index={index}>
@@ -184,6 +184,8 @@ const Overview = () => {
                     )}
                 </Droppable>
             </DragDropContext>
+            {/* enable toast notification */}
+            <ToastContainer position="top-right" closeOnClick pauseOnHover />
         </div>
     )
 }
