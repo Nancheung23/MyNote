@@ -7,6 +7,7 @@ import DateTimePicker from "react-datetime-picker"
 import { Line } from "react-chartjs-2"
 import "react-calendar/dist/Calendar.css"
 import "react-datetime-picker/dist/DateTimePicker.css"
+import { useTheme } from "../contexts/ThemeContext"
 
 // Chart.js
 import {
@@ -27,6 +28,9 @@ const StatisticsView = () => {
     const [startDate, setStartDate] = useState(null)
     const [endDate, setEndDate] = useState(null)
     const [chartData, setChartData] = useState(null)
+
+    // get current theme
+    const { theme } = useTheme()
 
     // Fetch data for all notes
     useEffect(() => {
@@ -80,7 +84,7 @@ const StatisticsView = () => {
     }, [startDate, endDate, notes])
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
+        <div className={`p-8 min-h-screen ${theme.bgColor} ${theme.textColor}`}>
             <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Statistics</h1>
 
             {/* picker */}

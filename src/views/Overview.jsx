@@ -6,12 +6,15 @@ import Note from "../components/Note"
 import '../assets/styles/overview.css'
 import Dropdown from "../components/Dropdown"
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { useTheme } from "../contexts/ThemeContext"
 
 const Overview = () => {
     const [notes, setNotes] = useState([])
     const [loading, setLoading] = useState(true)
     const [totalTags, setTotalTags] = useState([])
     const [selectedTags, setSelectedTags] = useState([])
+    // get current theme
+    const { theme } = useTheme()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -188,7 +191,7 @@ const Overview = () => {
     }
 
     return (
-        <div className="p-8 bg-gray-50 min-h-screen">
+        <div className={`p-8 min-h-screen ${theme.bgColor} ${theme.textColor}`}>
             <h1 className="text-3xl font-bold text-gray-800 mb-8">Task Overview</h1>
 
             <div className="mb-6">

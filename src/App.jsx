@@ -1,9 +1,12 @@
 import React from 'react'
 import AppRoutes from './routes/AppRoutes'
+import { ThemeProvider } from "./contexts/ThemeContext"
 
 const App = () => {
     return (
-        <AppRoutes />
+        <ThemeProvider>
+            <AppRoutes />
+        </ThemeProvider>
     )
 }
 

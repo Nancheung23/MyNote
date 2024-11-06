@@ -4,6 +4,8 @@ import "react-toastify/dist/ReactToastify.css"
 import noteServices from '../services/noteServices'
 import '../assets/styles/overview.css'
 import { useNavigate } from "react-router-dom"
+import { useTheme } from "../contexts/ThemeContext"
+
 
 const TaskCreation = () => {
     const [newNoteName, setNewNoteName] = useState('')
@@ -14,6 +16,8 @@ const TaskCreation = () => {
     const [loading, setLoading] = useState(true)
     // redirect
     const navigate = useNavigate()
+    // get current theme
+    const { theme } = useTheme()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -110,7 +114,7 @@ const TaskCreation = () => {
     }
 
     return (
-        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
+        <div className={`p-8 min-h-screen ${theme.bgColor} ${theme.textColor}`}>
             <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create A Task</h1>
             <form onSubmit={handleCreate} className="space-y-6">
                 <div>
