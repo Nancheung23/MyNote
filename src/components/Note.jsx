@@ -1,9 +1,9 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import "react-toastify/dist/ReactToastify.css"
 import { FaEdit } from "react-icons/fa"
 
 // 2 callback parameters
-const Note = ({ note, onStatusChange, onUpdateTags }) => {
+const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName }) => {
     // set initial status
     let lastType = 0
     if (note.timestamps.length > 0) {
@@ -12,10 +12,14 @@ const Note = ({ note, onStatusChange, onUpdateTags }) => {
     const [isActivated, setIsActivated] = useState(lastType === 0 ? true : false)
     // default status: is not editing
     const [isEditing, setIsEditing] = useState(false)
+    // new name: in note's attribute
+    const [newName, setNewName] = useState(note.name)
     // new tags: in note's tags array
     const [newTags, setNewTags] = useState(note.tags.map(tag => tag.name).join(','))
 
-
+    // useRef for tracking focus state
+    const nameInputRef = useRef(null)
+    const tagsInputRef = useRef(null)
     // handle toggle
     const toggleStatus = () => {
         const newType = isActivated ? 1 : 0
@@ -38,18 +42,53 @@ const Note = ({ note, onStatusChange, onUpdateTags }) => {
     // tags editing
     const handleTagChange = (e) => setNewTags(e.target.value)
 
+    // name editing
+    const handleNameChange = (e) => setNewName(e.target.value)
+
     // handle submit
     const handleSubmit = () => {
+        if (newName.trim() === "") {
+            alert("Name cannot be empty")
+            return
+        }
         const updatedTags = newTags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
+        const updateName = newName ? newName : note.name
         onUpdateTags(note.id, updatedTags)
+        onUpdateName(note.id, updateName)
         setIsEditing(false)
+    }
+
+    const handleBlur = () => {
+        // if both not focused, exit editing
+        setTimeout(() => {
+            if (
+                document.activeElement !== nameInputRef.current &&
+                document.activeElement !== tagsInputRef.current
+            ) {
+                handleSubmit()
+            }
+        }, 0)
     }
 
     return (
         <div className="flex items-center justify-between bg-white rounded-lg p-4 max-w-md mx-auto space-x-4">
             {/* title */}
             <div className="flex-1">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">{note.name}</h2>
+                {isEditing ? (
+                    <input
+                        type="text"
+                        value={newName}
+                        onChange={handleNameChange}
+                        onBlur={handleBlur}
+                        ref={nameInputRef}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                        className="border border-gray-300 rounded px-2 py-1 text-xs"
+                        placeholder="Enter tags separated by commas"
+                        autoFocus
+                    />
+                ) : (
+                    <h2 className="text-xl font-semibold text-gray-800 mb-2">{note.name}</h2>
+                )}
             </div>
             {/* tags */}
             <div className="flex flex-wrap gap-2">
@@ -58,7 +97,8 @@ const Note = ({ note, onStatusChange, onUpdateTags }) => {
                         type="text"
                         value={newTags}
                         onChange={handleTagChange}
-                        onBlur={handleSubmit}
+                        onBlur={handleBlur}
+                        ref={tagsInputRef}
                         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                         className="border border-gray-300 rounded px-2 py-1 text-xs"
                         placeholder="Enter tags separated by commas"
@@ -75,7 +115,7 @@ const Note = ({ note, onStatusChange, onUpdateTags }) => {
             </div>
             {/* button */}
             <button onClick={toggleEditing} className="ml-4 text-gray-500 hover:text-gray-700">
-                <FaEdit size={16} />
+                <FaEdit size={20} />
             </button>
             <div className="flex flex-col items-center">
                 <div

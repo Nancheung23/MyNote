@@ -36,60 +36,97 @@ const Overview = () => {
 
     // update tag status in backend when edit tags
     const updateNoteTags = async (noteId, updatedTags) => {
-        // reset note firstly
-        setNotes(prev =>
-            prev.map(note => note.id === noteId ? { ...note, tags: updatedTags } : note)
-        )
-        try {
-            // find deleted and added tag
-            const addedTags = updatedTags.filter(tag => !totalTags.includes(tag))
-            const removedTags = totalTags.filter(tag => !updatedTags.includes(tag))
-            // POST tag
-            for (const tag of addedTags) {
-                await noteServices.create('tags', { name: tag })
-                console.log('added:', tag)
-            }
+        const currentTags = notes.find(note => note.id === noteId).tags.map(tag => tag.name)
+        const areTagsSame = currentTags.length === updatedTags.length &&
+            currentTags.every(tag => updatedTags.includes(tag))
+        if (areTagsSame) {
+            return
+        } else {
+            try {
+                // find deleted and added tag
+                const addedTags = updatedTags.filter(tag => !totalTags.includes(tag))
+                const removedTags = totalTags.filter(tag => !updatedTags.includes(tag))
+                // POST tag
+                for (const tag of addedTags) {
+                    await noteServices.create('tags', { name: tag })
+                    console.log('added:', tag)
+                }
 
-            // update total tags
-            const allTags = await noteServices.getAll('tags')
-            setTotalTags(allTags.map(tag => tag.name))
+                // update total tags
+                const allTags = await noteServices.getAll('tags')
+                setTotalTags(allTags.map(tag => tag.name))
 
-            // DELETE tag (pass)
-            for (const tag of removedTags) {
-                const isTagUsedElsewhere = notes.some(note =>
-                    note.id !== noteId && note.tags.some(t => t.name === tag)
-                )
-                if (!isTagUsedElsewhere) {
-                    const tagToDelete = allTags.find(t => t.name === tag)
-                    if (tagToDelete) {
-                        await noteServices.del('tags', tagToDelete.id)
-                        console.log('deleted:', tagToDelete)
+                // DELETE tag (pass)
+                for (const tag of removedTags) {
+                    const isTagUsedElsewhere = notes.some(note =>
+                        note.id !== noteId && note.tags.some(t => t.name === tag)
+                    )
+                    if (!isTagUsedElsewhere) {
+                        const tagToDelete = allTags.find(t => t.name === tag)
+                        if (tagToDelete) {
+                            await noteServices.del('tags', tagToDelete.id)
+                            console.log('deleted:', tagToDelete)
+                        }
                     }
                 }
+
+                // PUT task
+                const tagReference = updatedTags
+                    .map(tagName => {
+                        const tag = allTags.find(t => t.name === tagName)
+                        return tag ? tag.id : null
+                    })
+                    .filter(tagId => tagId !== null)
+
+                await noteServices.update('tasks', {
+                    id: noteId,
+                    name: notes.find(note => note.id === noteId).name,
+                    tags: tagReference.join(',')
+                })
+
+                // update note
+                const newNotes = await noteServices.getNotes()
+                setNotes(newNotes)
+
+                // notification for successful modification
+                toast.success("Task's tags modified successfully!", {
+                    autoClose: 2000
+                })
+            } catch (error) {
+                console.log('failed to modify tags:', error)
+                toast.error("Failed to modify task's tags!")
+            }
+        }
+    }
+
+    // update name in backend when edit name
+    const updateNoteName = async (noteId, updateName) => {
+        if (notes.find(note => note.id === noteId).name === updateName) {
+            return
+        }
+        try {
+            const isNameUnique = !notes.some(note => note.name === updateName)
+            if (updateName && isNameUnique) {
+                const tagIds = notes.find(note => note.id === noteId).tags.map(tag => tag.id).join(',')
+                await noteServices.update('tasks', {
+                    id: noteId,
+                    name: updateName,
+                    tags: tagIds
+                })
+                // update note
+                setNotes(prevNotes =>
+                    prevNotes.map(note =>
+                        note.id === noteId ? { ...note, name: updateName } : note
+                    )
+                )
+                // notification for successful modification
+                toast.success("Task's name modified successfully!", {
+                    autoClose: 2000
+                })
+            } else {
+                toast.error("Task name must be unique and not empty!")
             }
 
-            // PUT task
-            const tagReference = updatedTags
-                .map(tagName => {
-                    const tag = allTags.find(t => t.name === tagName)
-                    return tag ? tag.id : null
-                })
-                .filter(tagId => tagId !== null)
-
-            await noteServices.update('tasks', {
-                id: noteId,
-                name: notes.find(note => note.id === noteId).name,
-                tags: tagReference.join(',')
-            })
-
-            // update note
-            const newNotes = await noteServices.getNotes()
-            setNotes(newNotes)
-
-            // notification for successful modification, wait for return...
-            toast.success("Task modified successfully!", {
-                autoClose: 2000
-            })
         } catch (error) {
             console.log('failed to modify:', error)
             toast.error("Failed to modify task!")
@@ -174,7 +211,7 @@ const Overview = () => {
                                                     {...provided.dragHandleProps}
                                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
                                                 >
-                                                    <Note note={note} onStatusChange={handleStatusChange} onUpdateTags={updateNoteTags} />
+                                                    <Note note={note} onStatusChange={handleStatusChange} onUpdateTags={updateNoteTags} onUpdateName={updateNoteName} />
                                                 </div>
                                             )}
                                         </Draggable>
