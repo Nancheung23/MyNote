@@ -39,6 +39,13 @@ const Overview = () => {
         const currentTags = notes.find(note => note.id === noteId).tags.map(tag => tag.name)
         const areTagsSame = currentTags.length === updatedTags.length &&
             currentTags.every(tag => updatedTags.includes(tag))
+        // prevent from create duplicated tags
+        if (
+            currentTags.some((tag, index) => currentTags.findIndex(t => t === tag) !== index)
+        ) {
+            toast.error("Don't put duplicated task's tags!")
+            return
+        }
         if (areTagsSame) {
             return
         } else {
