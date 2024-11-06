@@ -133,6 +133,18 @@ const Overview = () => {
         }
     }
 
+    // delete note
+    const handleDeleteNote = async (noteId) => {
+        try {
+            await noteServices.del('tasks', noteId)
+            setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId))
+            toast.success("Note deleted successfully!", { autoClose: 2000 })
+        } catch (error) {
+            console.log('failed to delete note:', error)
+            toast.error("Failed to delete note!")
+        }
+    }
+
     // Update note status in backend when toggled
     const handleStatusChange = async (noteId, newTimestamp) => {
         // Update frontend state with new timestamp
@@ -211,7 +223,7 @@ const Overview = () => {
                                                     {...provided.dragHandleProps}
                                                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
                                                 >
-                                                    <Note note={note} onStatusChange={handleStatusChange} onUpdateTags={updateNoteTags} onUpdateName={updateNoteName} />
+                                                    <Note note={note} onStatusChange={handleStatusChange} onUpdateTags={updateNoteTags} onUpdateName={updateNoteName} onDeleteNote={handleDeleteNote} />
                                                 </div>
                                             )}
                                         </Draggable>

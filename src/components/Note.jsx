@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react"
 import "react-toastify/dist/ReactToastify.css"
-import { FaEdit } from "react-icons/fa"
+import { FaEdit, FaTrash } from "react-icons/fa"
 
 // 2 callback parameters
-const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName }) => {
+const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName, onDeleteNote }) => {
     // set initial status
     let lastType = 0
     if (note.timestamps.length > 0) {
@@ -58,6 +58,13 @@ const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName }) => {
         setIsEditing(false)
     }
 
+    // handle delete
+    const handleDelete = () => {
+        if (window.confirm("Are you sure you want to delete this note?")) {
+            onDeleteNote(note.id)
+        }
+    }
+
     const handleBlur = () => {
         // if both not focused, exit editing
         setTimeout(() => {
@@ -108,7 +115,8 @@ const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName }) => {
                     :
                     (
                         note.tags.map((tag, index) => (
-                            <span key={tag.id || tag.name || index} className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                            <span key={`${tag}-${index}`}
+                                className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
                                 {tag.name}
                             </span>
                         )))}
@@ -116,6 +124,10 @@ const Note = ({ note, onStatusChange, onUpdateTags, onUpdateName }) => {
             {/* button */}
             <button onClick={toggleEditing} className="ml-4 text-gray-500 hover:text-gray-700">
                 <FaEdit size={20} />
+            </button>
+
+            <button onClick={handleDelete} className="ml-2 text-red-500 hover:text-red-700">
+                <FaTrash size={20} />
             </button>
             <div className="flex flex-col items-center">
                 <div

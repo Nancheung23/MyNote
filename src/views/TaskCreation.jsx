@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom"
 const TaskCreation = () => {
     const [newNoteName, setNewNoteName] = useState('')
     const [newNoteTags, setNewNoteTags] = useState('')
+    // add function for selecting current tags
+    const [selectedTags, setSelectedTags] = useState([])
     const [totalTags, setTotalTags] = useState([])
     const [loading, setLoading] = useState(true)
     // redirect
@@ -38,6 +40,8 @@ const TaskCreation = () => {
         // get input from form
         const newTimestamp = new Date().toISOString().replace('T', ' ').replace('Z', '')
         const inputTags = newNoteTags.split(',').map(tag => tag.trim())
+        // filter non exist tags
+        const finalTags = [...selectedTags, ...inputTags].filter(tag => tag)
         // filter new tag not included in tags
         const newTags = inputTags.filter(tag => !totalTags.includes(tag))
         try {
@@ -55,7 +59,7 @@ const TaskCreation = () => {
             }
             // get update tags and references
             const updatedTags = await noteServices.getAll('tags')
-            const tagReference = inputTags.map(tagName => {
+            const tagReference = finalTags.map(tagName => {
                 const tag = updatedTags.find(t => t.name === tagName)
                 return tag ? tag.id : null
             }).filter(tagId => tagId !== null).join(',')
@@ -87,6 +91,13 @@ const TaskCreation = () => {
         }
     }
 
+    const handleTagSelection = (tag) => {
+        if (!newNoteTags.includes(tag)) {
+            // put selected tags
+            setNewNoteTags(prev => prev ? `${prev}, ${tag}` : tag)
+        }
+    }
+
     return (
         <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
             <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create A Task</h1>
@@ -102,7 +113,19 @@ const TaskCreation = () => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Tags</label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                        {totalTags.map(tag => (
+                            <button
+                                key={tag}
+                                type="button"
+                                onClick={() => handleTagSelection(tag)}
+                                className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
+                            >
+                                {tag}
+                            </button>
+                        ))}
+                    </div>
                     <input type="text"
                         value={newNoteTags}
                         onChange={e => setNewNoteTags(e.target.value)}
