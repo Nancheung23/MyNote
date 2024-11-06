@@ -40,41 +40,53 @@ const Overview = () => {
         setNotes(prev =>
             prev.map(note => note.id === noteId ? { ...note, tags: updatedTags } : note)
         )
-        // find deleted and added tag
-        const addedTags = updatedTags.filter(tag => !totalTags.includes(tag))
-        setTotalTags([...totalTags, ...addedTags])
-        const removedTags = totalTags.filter(tag => !updatedTags.includes(tag))
-        setTotalTags(totalTags.filter(tag => !removedTags.includes(tag)))
         try {
+            // find deleted and added tag
+            const addedTags = updatedTags.filter(tag => !totalTags.includes(tag))
+            const removedTags = totalTags.filter(tag => !updatedTags.includes(tag))
             // POST tag
             for (const tag of addedTags) {
-                await noteServices.create('tags', {
-                    name: tag
-                })
+                await noteServices.create('tags', { name: tag })
+                console.log('added:', tag)
             }
-            // DELETE tag
+
+            // update total tags
+            const allTags = await noteServices.getAll('tags')
+            setTotalTags(allTags.map(tag => tag.name))
+
+            // DELETE tag (pass)
             for (const tag of removedTags) {
-                const tagToDelete = notes.find(note => note.id === noteId)?.tags.find(t => t.name === tag)
-                if (tagToDelete) {
-                    await noteServices.del('tags', {
-                        id: tagToDelete.id,
-                        name: tag
-                    })
+                const isTagUsedElsewhere = notes.some(note =>
+                    note.id !== noteId && note.tags.some(t => t.name === tag)
+                )
+                if (!isTagUsedElsewhere) {
+                    const tagToDelete = allTags.find(t => t.name === tag)
+                    if (tagToDelete) {
+                        await noteServices.del('tags', tagToDelete.id)
+                        console.log('deleted:', tagToDelete)
+                    }
                 }
             }
+
             // PUT task
-            const updatedTags = await noteServices.getAll('tags')
-            const tagReference = updatedTags.map(tagName => {
-                const tag = updatedTags.find(t => t.name === tagName)
-                return tag ? tag.id : null
-            }).filter(tagId => tagId !== null).join(',')
+            const tagReference = updatedTags
+                .map(tagName => {
+                    const tag = allTags.find(t => t.name === tagName)
+                    return tag ? tag.id : null
+                })
+                .filter(tagId => tagId !== null)
+
             await noteServices.update('tasks', {
                 id: noteId,
                 name: notes.find(note => note.id === noteId).name,
-                tags: tagReference
+                tags: tagReference.join(',')
             })
 
-            // notification for successful modification
+            // update note
+            const newNotes = await noteServices.getNotes()
+            setNotes(newNotes)
+
+            // notification for successful modification, wait for return...
             toast.success("Task created successfully!", {
                 autoClose: 2000
             })

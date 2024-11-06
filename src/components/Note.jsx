@@ -67,17 +67,17 @@ const Note = ({ note, onStatusChange, onUpdateTags }) => {
                 )
                     :
                     (
-                        note.tags.map(tag => (
-                            <span key={tag.id || tag.name} className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                        note.tags.map((tag, index) => (
+                            <span key={tag.id || tag.name || index} className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
                                 {tag.name}
                             </span>
                         )))}
             </div>
             {/* button */}
+            <button onClick={toggleEditing} className="ml-4 text-gray-500 hover:text-gray-700">
+                <FaEdit size={16} />
+            </button>
             <div className="flex flex-col items-center">
-                <button onClick={toggleEditing} className="ml-4 text-gray-500 hover:text-gray-700">
-                    <FaEdit size={16} />
-                </button>
                 <div
                     onClick={toggleStatus}
                     className={`w-16 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${isActivated ? 'bg-green-500' : 'bg-red-500'}`}

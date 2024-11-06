@@ -31,28 +31,28 @@ const update = async (category, newObject) => {
         const url = `${baseUrl}${category}/${newObject.id}`
         const response = await axios.put(url, newObject)
         console.log(`Update ${category} successfully`)
-        return response.data;
+        return response.data
     } catch (error) {
         console.error(`Failed to update from ${category}:`, error)
-        return null;
+        return null
     }
 }
 
 // delete
-const del = async (category, name) => {
+const del = async (category, id) => {
     try {
         const items = await getAll(category)
-        const itemToDelete = items.find(item => item.name === name)
+        const itemToDelete = items.find(item => item.id === id)
         if (!itemToDelete) {
-            console.log(`Item with name "${name}" not found in ${category}`)
+            console.log(`Item with id "${id}" not found in ${category}`)
             return null
         }
         const url = `${baseUrl}${category}/${itemToDelete.id}`
         const response = await axios.delete(url)
-        console.log(`DELETE ${category} successful for ${name}`)
+        console.log(`DELETE ${category} successful for ${id}`)
         return response.data
     } catch (error) {
-        console.error(`Failed to delete ${name} from ${category}:`, error)
+        console.error(`Failed to delete ${id} from ${category}:`, error)
         return null
     }
 }
